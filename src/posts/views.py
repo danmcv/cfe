@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import messages
 from .models import Post
@@ -14,8 +14,6 @@ def posts_create(request):
         instance.save()
         messages.success(request, "Successfully created")
         return HttpResponseRedirect(instance.get_absolute_url())
-    else:
-        messages.error(request, "Not successfully created")
     
     context = {
         "form":form,
@@ -41,7 +39,7 @@ def posts_list(request):
         "title": "Detail"
     }
 
-    return render(request, "index.html", context)
+    return render(request, "post_list.html", context)
 
 def posts_update(request, id=None):
     instance = get_object_or_404(Post, id=id)
@@ -61,6 +59,9 @@ def posts_update(request, id=None):
 
     return render(request, "post_form.html", context)
 
-def posts_delete(request):
-    return HttpResponse("<h1>Delete</h1>")
+def posts_delete(request, id=None):
+    instance = get_object_or_404(Post, id=id)
+    instance.delete()
+    messages.success(request, "Post Deleted")
+    return redirect("posts:list")
 
